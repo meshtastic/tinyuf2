@@ -151,16 +151,15 @@ void tud_msc_write10_complete_cb(uint8_t lun) {
   // abort the DFU, uf2 block failed integrity check
   if (_wr_state.aborted) {
     // aborted and reset
-    indicator_set(STATE_WRITING_FINISHED);
+    return;
   } else if (_wr_state.numBlocks) {
-    // Start LED writing pattern with first write
+    // Track when flashing begins for optional speed measurements
     if (first_write) {
       #if DEBUG_SPEED_TEST
       _write_ms = esp_log_timestamp();
       #endif
 
       first_write = false;
-      indicator_set(STATE_WRITING_STARTED);
     }
 
     // All block of uf2 file is complete --> complete DFU process
@@ -173,7 +172,6 @@ void tud_msc_write10_complete_cb(uint8_t lun) {
       #endif
 
       TUF2_LOG1("Writing finished\r\n");
-      indicator_set(STATE_WRITING_FINISHED);
       board_dfu_complete();
 
       // board_dfu_complete() should not return

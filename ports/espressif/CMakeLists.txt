@@ -31,11 +31,20 @@ cmake_print_variables(GIT_VERSION GIT_SUBMODULE_VERSIONS)
 
 project(tinyuf2)
 
+idf_build_get_property(idf_path IDF_PATH)
+idf_build_get_property(idf_python PYTHON)
+if(NOT idf_python)
+  set(idf_python ${Python_EXECUTABLE})
+endif()
+set(ESPTOOL_PY_CMD "\"${idf_python}\" \"${idf_path}/components/esptool_py/esptool/esptool.py\"")
+set(GEN_ESP32PART_CMD "\"${idf_python}\" \"${idf_path}/components/partition_table/gen_esp32part.py\"")
+
 # Create post-build script for combined.bin / combined-ota.bin
 file(WRITE ${CMAKE_BINARY_DIR}/tinyuf2.postbuild.sh
   "#!/bin/bash\n"
+  "set -euo pipefail\n"
   "echo \"Creating combined.bin\"\n"
-  "esptool.py --chip ${IDF_TARGET} merge_bin --output combined.bin $(tr '\\n' ' ' < ${CMAKE_BINARY_DIR}/flash_args)\n"
+  "${ESPTOOL_PY_CMD} --chip ${IDF_TARGET} merge_bin --output combined.bin $(tr '\\n' ' ' < ${CMAKE_BINARY_DIR}/flash_args)\n"
 )
 
 # check if board is 4MB flash and create combined-ota.bin
@@ -44,8 +53,8 @@ string(FIND ${BOARD_SDKCONFIG_CONTENTS} "partitions-4MB-noota.csv" MATCH_INDEX)
 if(NOT MATCH_INDEX EQUAL -1)
   file(APPEND ${CMAKE_BINARY_DIR}/tinyuf2.postbuild.sh
     "echo \"Creating combined-ota.bin\"\n"
-    "gen_esp32part.py ${CMAKE_CURRENT_LIST_DIR}/partitions-4MB.csv ${CMAKE_BINARY_DIR}/partition_table/partitions-table-ota.bin\n"
-    "esptool.py --chip ${IDF_TARGET} merge_bin --output combined-ota.bin $(tr '\\n' ' ' < ${CMAKE_BINARY_DIR}/flash_args | sed 's/partition-table.bin/partitions-table-ota.bin/g')\n"
+    "${GEN_ESP32PART_CMD} ${CMAKE_CURRENT_LIST_DIR}/partitions-4MB.csv ${CMAKE_BINARY_DIR}/partition_table/partitions-table-ota.bin\n"
+    "${ESPTOOL_PY_CMD} --chip ${IDF_TARGET} merge_bin --output combined-ota.bin $(tr '\\n' ' ' < ${CMAKE_BINARY_DIR}/flash_args | sed 's/partition-table.bin/partitions-table-ota.bin/g')\n"
     "cp ${CMAKE_BINARY_DIR}/partition_table/partitions-table-ota.bin ${ARTIFACT_PATH}/partitions-table-ota.bin\n"
     "cp combined-ota.bin ${ARTIFACT_PATH}/combined-ota.bin\n"
     )
@@ -83,7 +92,7 @@ add_custom_target(combined-flash
 
 # Post build: generate bootloader_bin.c for update-tinyuf2 and combined.bin
 add_custom_command(TARGET app POST_BUILD
-  COMMAND ${Python_EXECUTABLE} ${UF2CONV_PY} --carray -o ${CMAKE_CURRENT_LIST_DIR}/apps/update_tinyuf2/main/bootloader_bin.c ${CMAKE_BINARY_DIR}/tinyuf2.bin
+  COMMAND ${idf_python} ${UF2CONV_PY} --carray -o ${CMAKE_CURRENT_LIST_DIR}/apps/update_tinyuf2/main/bootloader_bin.c ${CMAKE_BINARY_DIR}/tinyuf2.bin
   )
 
 externalproject_add(update-tinyuf2

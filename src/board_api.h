@@ -308,26 +308,6 @@ void board_self_update(const uint8_t * bootloader_bin, uint32_t bootloader_len);
 #endif
 
 //--------------------------------------------------------------------+
-// not part of board API, move to its own file later
-//--------------------------------------------------------------------+
-
-enum {
-  STATE_BOOTLOADER_STARTED = 0,///< STATE_BOOTLOADER_STARTED
-  STATE_USB_PLUGGED,           ///< STATE_USB_PLUGGED
-  STATE_USB_UNPLUGGED,         ///< STATE_USB_UNPLUGGED
-  STATE_WRITING_STARTED,       ///< STATE_WRITING_STARTED
-  STATE_WRITING_FINISHED,      ///< STATE_WRITING_FINISHED
-};
-
-void indicator_set(uint32_t state);
-
-static inline void rgb_brightness(uint8_t out[3], uint8_t const in[3], uint8_t brightness) {
-  for(uint32_t i=0; i<3; i++ ) {
-    out[i] = (in[i]*brightness) >> 8;
-  }
-}
-
-//--------------------------------------------------------------------+
 //
 //--------------------------------------------------------------------+
 #define ST_CMD_DELAY 0x80 // special signifier for command lists

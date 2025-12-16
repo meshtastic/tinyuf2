@@ -6,6 +6,9 @@ The project is composed of customizing the 2nd stage bootloader from IDF and UF2
 
 Following boards are supported:
 
+- Generic ESP32-S2 reference configuration (generic_esp32s2)
+- Generic ESP32-S3 reference configuration (generic_esp32s3)
+
 - [Adafruit Magtag 2.9" E-Ink WiFi Display](https://www.adafruit.com/product/4800)
 - [Adafruit Metro ESP32-S2](https://www.adafruit.com/product/4775)
 - [Deneyap Kart 1A v2](https://magaza.deneyapkart.org/tr/product/detail/deneyap-kart-1a-v2-type-c)
@@ -39,7 +42,14 @@ Following boards are supported:
 Once installed and setup ESP-IDF, you can build with all target
 
 ```
-idf.py -DBOARD=adafruit_feather_esp32s2 build
+idf.py -DBOARD=generic_esp32s2 build
+```
+
+Alternatively, you can use PlatformIO from the repository root:
+
+```
+pio run -e generic_esp32s2 -t tinyuf2
+pio run -e generic_esp32s2 -t tinyuf2-clean  # optional fullclean
 ```
 
 ### Flash
@@ -47,8 +57,16 @@ idf.py -DBOARD=adafruit_feather_esp32s2 build
 You could flash it with flash target
 
 ```
-idf.py -DBOARD=adafruit_feather_esp32s2 flash
+idf.py -DBOARD=generic_esp32s2 flash
 ```
+
+With PlatformIO you can run:
+
+```
+pio run -e generic_esp32s2 -t tinyuf2-flash
+```
+
+Set `upload_port` in `platformio.ini` (or pass `--upload-port`) so PlatformIO knows which serial device to use when flashing.
 
 or you could also use pre-built binaries from [release page](https://github.com/adafruit/tinyuf2/releases). Extract and run following esptool commands
 

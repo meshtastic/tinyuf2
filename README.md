@@ -40,7 +40,7 @@ Not all features are implemented for all MCUs, following is supported MCUs and i
 
 ## Build and Flash
 
-Following is generic compiling information. Each port may require extra set-up and slight different process e.g esp32s2 require setup IDF.
+TinyUF2 can be built either with the legacy per-port makefiles or with the new PlatformIO-based workflow (currently focused on ESP32-Sx targets). Choose the path that matches your toolchain and hardware.
 
 ### Clone
 
@@ -52,7 +52,36 @@ cd tinyuf2
 git submodule update --init
 ```
 
-### Compile
+### PlatformIO (ESP32-Sx)
+
+The PlatformIO project wraps the ESP-IDF build so you can generate all TinyUF2 artifacts with a single command.
+
+1. Install the [PlatformIO Core CLI](https://docs.platformio.org/en/latest/core/installation.html).
+2. Clone this repository (see the commands above) and install submodules.
+3. Run the desired PlatformIO environment:
+
+  ```
+  pio run -e generic_esp32s2
+  pio run -e generic_esp32s3
+  ```
+
+  Each environment forwards the board name into the ESP-IDF build and writes outputs under `build/<board>/`.
+
+4. Use the custom helper targets for common tasks:
+
+  ```
+  pio run -e generic_esp32s3 -t tinyuf2-clean   # idf.py fullclean
+  pio run -e generic_esp32s3 -t tinyuf2         # idf.py build
+  pio run -e generic_esp32s3 -t tinyuf2-flash   # idf.py flash (uses ESP-IDF esptool)
+  ```
+
+Artifacts such as `tinyuf2.bin`, `combined.bin`, and the UF2 updater application are copied into `build/<board>/artifacts/`. The build also emits `flash_args`, `bootloader.bin`, and optional OTA images ready for esptool.
+
+PlatformIO automatically launches the ESP-IDF python virtual environment, so no additional manual activation is required. If you need to adjust `sdkconfig` values, edit the board-specific file in `ports/espressif/boards/<board>/sdkconfig` before rebuilding.
+
+### Traditional make-based flow
+
+The original makefiles remain available for the other microcontroller families.
 
 Firstly we need to get all submodule dependency for our board using `tools/get_deps.py` script with either family input or using --board option. You only need to do this once for each family
 
@@ -73,7 +102,7 @@ Then compile with `all` target:
 make BOARD=feather_stm32f405_express all
 ```
 
-### Flash
+### Flash (make)
 
 `flash` target will use the default on-board debugger (jlink/cmsisdap/stlink/dfu) to flash the binary, please install those support software in advance. Some board use bootloader/DFU via serial which is required to pass to make command
 
@@ -83,7 +112,7 @@ make BOARD=feather_stm32f405_express flash
 
 If you use an external debugger, there is `flash-jlink`, `flash-stlink`, `flash-pyocd` which are mostly like to work out of the box for most of the supported board.
 
-### Debug
+### Debug (make)
 
 To compile for debugging add `DEBUG=1`, this will mostly change the compiler optimization
 

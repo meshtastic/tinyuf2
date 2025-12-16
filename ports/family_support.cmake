@@ -40,7 +40,15 @@ endif ()
 #-------------------------------------------------------------
 # FAMILY and BOARD
 #-------------------------------------------------------------
-if (NOT BOARD)
+if (NOT DEFINED BOARD OR BOARD STREQUAL "")
+  if (DEFINED ENV{IDF_BOARD} AND NOT "$ENV{IDF_BOARD}" STREQUAL "")
+    set(BOARD $ENV{IDF_BOARD})
+  elseif (DEFINED ENV{BOARD} AND NOT "$ENV{BOARD}" STREQUAL "")
+    set(BOARD $ENV{BOARD})
+  endif ()
+endif ()
+
+if (NOT DEFINED BOARD OR BOARD STREQUAL "")
   message(FATAL_ERROR "BOARD not specified")
 endif ()
 

@@ -9,3 +9,33 @@ _bin/
 sdkconfig~
 *.yml~
 ports/espressif/apps/self_update/main/bootloader_bin.c
+
+# Editor & OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# PlatformIO / ESP-IDF outputs
+/.pio/
+/build/
+/build-*/
+/sdkconfig.*
+idf_env.json
+idfkit.json
+
+# CMake / Ninja extras
+/CMakeFiles/
+/CMakeCache.txt
+/cmake-build-*/
+/compile_commands.json
+
+# Logs & traces
+*.log
+*.trace
+*.tmp

@@ -7,10 +7,8 @@
 function (add_tinyuf2_src TARGET)
   target_sources(${TARGET} PUBLIC
     ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ghostfat.c
-    ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/images.c
     ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/main.c
     ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/msc.c
-    ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/screen.c
     ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/usb_descriptors.c
     ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/board_api.h
     )
